@@ -1,6 +1,6 @@
 #  CoWIN Auto Booking Slot
 
-Auto Book when there is a vaccine slot available at your location, by running a script on your phone. 
+Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
 
   ## Getting Started
