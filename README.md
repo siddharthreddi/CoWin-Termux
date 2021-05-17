@@ -14,7 +14,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
    - Step 1 : ( Install git and Clone repo )
 
-         pkg install git && git clone https://github.com/truroshan/CoWin-Termux.git
+         pkg install git && git clone https://github.com/truroshan/cowin-termux.git
         
    - Step 2 : Open Cloned Folder and run install.sh 
         
