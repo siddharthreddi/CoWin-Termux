@@ -2,6 +2,8 @@
 
 Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
+## Demo Video
+https://telegra.ph/file/f8c4cc3db51609a63e5b1.mp4
 
   ## Getting Started
   By using Tremux you can run script and recieve the notification on your phone.
