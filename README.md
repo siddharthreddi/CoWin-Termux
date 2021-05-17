@@ -18,7 +18,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
         
    - Step 2 : Open Cloned Folder and run install.sh 
         
-         cd CoWin-Termux && bash install.sh
+         cd cowin-termux && bash install.sh
 
 
 ## Running Main Script for CoWin Booking
