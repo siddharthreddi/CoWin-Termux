@@ -11,7 +11,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
     - Install Termux App  [Link](https://play.google.com/store/apps/details?id=com.termux&hl=en_IN&gl=US).
 
-    - Install Termux App ( Required v 0.31 to read SMS ) [Apkpure Link](https://m.apkpure.com/termux-api/com.termux.api/download/31-APK).
+    - Install Termux:API ( Required v 0.31 to read SMS ) [Apkpure Link](https://m.apkpure.com/termux-api/com.termux.api/download/31-APK).
  - ### Installing Packages and Requirements
 
    - Step 1 : ( Install git and Clone repo )
