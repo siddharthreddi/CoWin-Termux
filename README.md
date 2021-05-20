@@ -1,4 +1,4 @@
-#  CoWIN Auto Booking Slot
+#  CoWIN Auto Booking Slot ( Updated on 20/05/2021 )
 
 Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
@@ -27,7 +27,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
 Command for script :
 
-    python cowin.py --m <MOBILE-NO> --p <PIN-CODE> --a <YOUR-AGE> --t <INTERVAL-MINUTE> --d <DOSE-COUNT> --fast
+    python cowin.py --m <MOBILE-NO> --p <PIN-CODE> --a <YOUR-AGE> --t <INTERVAL-SECOND> --d <DOSE-COUNT> --fast
     
     python cowin.py --m 9966996699 --p 110011 --a 45 --t 1 --d 1 --fast
     
@@ -40,5 +40,5 @@ Optional arguments accepted:
 
   - Pass `--a = YOUR-AGE ` with your age (default is 18).
   - Pass `--d = DOSE_COUNT` Vaccine First Dose or Second Dose (default dose is 1).
-  - Pass `--t = INTERVAL-IN-MINUTES` to change the frequency of calling Cowin API  (default is 1 min).
+  - Pass `--t = INTERVAL-IN-SECOND` to change the frequency of calling Cowin API  (default is 30 sec).
   - Only Pass `--fast` for direct booking no scheduling.
