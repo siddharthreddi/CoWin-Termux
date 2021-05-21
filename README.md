@@ -2,6 +2,9 @@
 
 Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
+[Group in Telegram](https://t.me/CoWIN_Termux)
+![](https://gist.githubusercontent.com/m8rge/4c2b36369c9f936c02ee883ca8ec89f1/raw/c03fd44ee2b63d7a2a195ff44e9bb071e87b4a40/telegram-single-path-24px.svg)
+
   # Demo Video
   https://user-images.githubusercontent.com/45506201/118438178-8b02d100-b701-11eb-873c-8521def5b1a0.mp4
 
