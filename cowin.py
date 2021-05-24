@@ -135,7 +135,7 @@ class CoWinBook():
         otp_fetching_mode = ""
         if self.otp == 'a':
             otp_fetching_mode = 'AutoMode'
-        if self.otp == 's':
+        elif self.otp == 's':
             otp_fetching_mode = 'SiteMode'
         else:
             otp_fetching_mode = "ManualMode"
@@ -174,18 +174,15 @@ class CoWinBook():
         # Get OTP using Termux:API v0.31 
         if self.otp == 'a':
             msg = subprocess.Popen(
-                                '   ',
-                                stdin=subprocess.DEVNULL,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE,shell=True).communicate()[0].decode('utf-8')
-
+                                    'termux-sms-list -l 1',
+                                    stdin=subprocess.DEVNULL,
+                                    stdout=subprocess.PIPE,
+                                    stderr=subprocess.PIPE,shell=True).communicate()[0].decode('utf-8')
             try:
-                if msg != '':
-                    msg = json.loads(msg)[0]
-                    return msg
+                msg = json.loads(msg)[0]
+                return msg
             finally:
-                raise Exception("Install Termux:API v0.31")
-        
+                raise Exception("Install Termux:API 0.31 Version for AutoMode  ")
         # Get OTP using DB hosted on Cloudflare and Attached with https://play.google.com/store/apps/details?id=com.gawk.smsforwarder
         elif self.otp == 's':
 
@@ -448,4 +445,3 @@ if __name__ == '__main__':
     line_break()
 
     scheduler.start()
-
