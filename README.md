@@ -1,4 +1,4 @@
-#  CoWIN Auto Booking Slot ( Updated on 22/05/2021 )
+#  CoWIN Auto Booking Slot (24/05/2021 )
 
 Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
@@ -10,38 +10,54 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
   ## Getting Started
   By using Tremux you can run script and recieve the notification on your phone.
-  - ### Setting Up Termux
+  - ### Install Termux
 
-    - Install Termux App  [Link](https://play.google.com/store/apps/details?id=com.termux&hl=en_IN&gl=US).
+    - Install Termux App  [Playstore](https://play.google.com/store/apps/details?id=com.termux&hl=en_IN&gl=US).
 
-    - Install Termux:API ( Required v 0.31 to read SMS ) [Apkpure Link](https://m.apkpure.com/termux-api/com.termux.api/download/31-APK).
+    
  - ### Installing Packages and Requirements
 
-   - Step 1 : ( Install git and Clone repo )
+   - Step 1 : Install git
 
-         pkg install git && git clone https://github.com/truroshan/cowin-termux.git
-        
-   - Step 2 : Open Cloned Folder and run install.sh 
-        
-         cd cowin-termux && bash install.sh
+         pkg install git
 
+   - Step 2 : Clone repo 
+
+         git clone https://github.com/truroshan/cowin-termux.git
+        
+   - Step 3 : Open Cloned Folder
+        
+         cd cowin-termux
+
+   - Step 4: run install.sh 
+         
+         bash install.sh
+  - ### OTP Fetching Methods
+      // Three Options //
+    - AutoMode (`a`) : Fetch OTP using Termux:API App 
+      - Install Termux:API ( Required v 0.31 to read SMS ) [Apkpure Link](https://m.apkpure.com/termux-api/com.termux.api/download/31-APK).
+          
+    - SiteMode (`s`) :  Fetch OTP from Database Hosted on Cloudflare Worker
+      - setup Database on [Cloudflare.](https://github.com/truroshan/CloudflareCoWinDB)
+      - Install Automatically forward SMS to your PC/phone App. [Playstore](https://play.google.com/store/apps/details?id=com.gawk.smsforwarder)
+    - ManualMode (`m`) : Input method
 
 ## Running Main Script for CoWin Booking
 
 Command for script :
 
-    python cowin.py --m <MOBILE-NO> --p <PIN-CODE> --a <YOUR-AGE> --t <INTERVAL-SECOND> --d <DOSE-COUNT> --fast
+    python cowin.py --m <MOBILE-NO> --p <PIN-CODE> 
     
-    python cowin.py --m 9966996699 --p 110011 --a 45 --t 1 --d 1 --fast
+    python cowin.py --m 9966996699 --p 110011 
     
-Required values like mentioned below
+### :warning: Required values like mentioned below:
 
   - Replace `--m = MOBILE-NO` with your mobile no.
   - Replace `--p = PIN-CODE` with your pincode.
 
-Optional arguments accepted:
-
+### :bulb: Optional arguments accepted:
+  - Pass `--o` = OTP fetching mode.`a` = AutoMode `s` = SiteMode `m` = ManualMode
+    ( deault AutoMode )
   - Pass `--a = YOUR-AGE ` with your age (default is 18).
   - Pass `--d = DOSE_COUNT` Vaccine First Dose or Second Dose (default dose is 1).
   - Pass `--t = INTERVAL-IN-SECOND` to change the frequency of calling Cowin API  (default is 30 sec).
-  - Only Pass `--fast` for direct booking no scheduling.
