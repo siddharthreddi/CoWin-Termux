@@ -1,5 +1,4 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.schedulers import SchedulerNotRunningError
 from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from datetime import datetime
@@ -14,6 +13,12 @@ import sys
 import re
 import os
 
+
+OTP_SITE_URL = None
+''' 
+Add Worker Domain here example : https://db.domain.workers.dev
+Check this :  https://github.com/truroshan/CloudflareCoWinDB
+'''
 ua = UserAgent()
 scheduler = BlockingScheduler()
 
@@ -23,7 +28,7 @@ def clear_screen(): os.system("clear")
 
 class CoWinBook():
 
-    def __init__(self,mobile_no,pincode,age,dose):
+    def __init__(self,mobile_no,pincode,age,dose,otp):
         self.mobile_no = str(mobile_no)
         self.pincode = pincode # Area Pincode
         self.center_id = []  # Selected Vaccination Centers
@@ -36,6 +41,9 @@ class CoWinBook():
 
         # Dose 1 or Dose 2 ( default : 1)
         self.dose = dose
+
+        # OTP Fetching method 
+        self.otp = otp
 
         # User Age 18 or 45
         self.age =  age
@@ -123,18 +131,26 @@ class CoWinBook():
 
     # Request for OTP 
     def get_otp(self):
-         
-        print("OTP Sent 📲 ... ")
+        
+        otp_fetching_mode = ""
+        if self.otp == 'a':
+            otp_fetching_mode = 'AutoMode'
+        if self.otp == 's':
+            otp_fetching_mode = 'SiteMode'
+        else:
+            otp_fetching_mode = "ManualMode"
+
+        print(f"OTP Sent ({otp_fetching_mode}) 📲 ... ")
 
         otp = ""
 
-        try:            
-            curr_msg = self.get_last_msg().get("body")
+        try:    
+            curr_msg = self.get_msg().get("body")
 
             for i in reversed(range(15)):
-                
-                last_msg = self.get_last_msg().get("body")
-                
+            
+                last_msg = self.get_msg().get("body",'')
+            
                 print(f'Waiting for OTP {i} sec')
                 sys.stdout.write("\033[F")
 
@@ -143,29 +159,49 @@ class CoWinBook():
                     print("\nOTP Recieved : ",otp)
                     break
 
-                time.sleep(2)
-            
-        # Press Ctrl + C to Enter OTP Manually
-        except KeyboardInterrupt:
-            otp = input("\nEnter OTP Manually : ")
-        finally:
-            if not otp: otp = input("\nEnter OTP : ")
+                time.sleep(3)
+        except Exception as e:
+            print(e)
+       
+        if not otp: otp = input("\nEnter OTP : ")
 
         return hashlib.sha256(otp.encode('utf-8')).hexdigest()
 
     # Get Mobile last msg for otp Checking  
-    def get_last_msg(self):
-        msg = subprocess.Popen(
-                                'termux-sms-list -l 1',
+    def get_msg(self):
+        msg = {}
+
+        # Get OTP using Termux:API v0.31 
+        if self.otp == 'a':
+            msg = subprocess.Popen(
+                                '   ',
                                 stdin=subprocess.DEVNULL,
                                 stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE,shell=True).communicate()[0].decode('utf-8')
-        try:
-            msg = json.loads(msg)[0]
-            return msg
-        except KeyError:
-            raise Exception("Install Termux:API 0.31 Version  ")
 
+            try:
+                if msg != '':
+                    msg = json.loads(msg)[0]
+                    return msg
+            finally:
+                raise Exception("Install Termux:API v0.31")
+        
+        # Get OTP using DB hosted on Cloudflare and Attached with https://play.google.com/store/apps/details?id=com.gawk.smsforwarder
+        elif self.otp == 's':
+
+            if OTP_SITE_URL is None:
+                raise Exception("First Setup DB on Cloudflare \nhttps://github.com/truroshan/CloudflareCoWinDB ")
+
+            res = requests.get(f"{OTP_SITE_URL}/{self.mobile_no}",timeout=3).json()
+                
+            if res.get("status"):
+                msg['body'] = res.get('data').get("message")
+                requests.delete(f"{OTP_SITE_URL}/{self.mobile_no}")
+            return msg
+
+        # Lastly enter OTP Manually
+        raise Exception
+        
     # Request for Current Slot Deatails ( Private Request )
     def request_slot(self):
         todayDate = datetime.now().strftime("%d-%m-%Y")
@@ -387,7 +423,7 @@ class CoWinBook():
         self.user_id = USER_ID
 
  
-def main(mobile_no,pincode, age = 18,dose = 1,time = 30,fast = None):
+def main(mobile_no,pincode, age = 18,dose = 1,time = 30,otp = 'a'):
 
     # Correct Age
     age =  18 if age < 45 else 45
@@ -396,12 +432,7 @@ def main(mobile_no,pincode, age = 18,dose = 1,time = 30,fast = None):
     time = 30 if time > 30 else time
 
     global cowin
-    cowin = CoWinBook(mobile_no,pincode,age,dose)
-
-
-    try:
-        if fast:cowin.book_now()
-    except SchedulerNotRunningError: return
+    cowin = CoWinBook(mobile_no,pincode,age,dose,otp)
 
     scheduler.add_job(cowin.book_now, 'cron', second = f'*/{time}')
     print(f" 📍 {pincode} 💉 {age}+ ⌛️ {time} Seconds")
