@@ -181,7 +181,7 @@ class CoWinBook():
             try:
                 msg = json.loads(msg)[0]
                 return msg
-            finally:
+            except KeyError:
                 raise Exception("Install Termux:API 0.31 Version for AutoMode  ")
         # Get OTP using DB hosted on Cloudflare and Attached with https://play.google.com/store/apps/details?id=com.gawk.smsforwarder
         elif self.otp == 's':
