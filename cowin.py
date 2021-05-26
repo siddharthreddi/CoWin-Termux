@@ -1,5 +1,4 @@
 from apscheduler.schedulers.blocking import BlockingScheduler
-from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 from datetime import datetime
 import subprocess
@@ -13,13 +12,12 @@ import sys
 import re
 import os
 
-
 OTP_SITE_URL = None
 ''' 
 Add Worker Domain here example : https://db.domain.workers.dev
 Check this :  https://github.com/truroshan/CloudflareCoWinDB
 '''
-ua = UserAgent()
+
 scheduler = BlockingScheduler()
 
 def line_break(): print("-"*25)
@@ -28,9 +26,9 @@ def clear_screen(): os.system("clear")
 
 class CoWinBook():
 
-    def __init__(self,mobile_no,pincode,age,dose,otp):
+    def __init__(self,mobile_no,pin,age,dose,otp):
         self.mobile_no = str(mobile_no)
-        self.pincode = pincode # Area Pincode
+
         self.center_id = []  # Selected Vaccination Centers
         self.user_id = []  # Selected Users for Vaccination 
 
@@ -62,13 +60,25 @@ class CoWinBook():
         # Login and Save Token in file( filename same as mobile no)
         self.getSession()
 
+        self.checkByPincode = False
+        if type(pin) is int:
+            self.pin = pin # Area Pincode or District Id
+            self.checkByPincode = True if len(str(pin)) == 6 else False
+        else:
+            self.pin = self.get_district_id()
+        
+        
         # Selecting Center and User
         self.setup_details()
+
+        print(f" 📍 {self.pin} 💉 {age}+ ⌛️ {timeInSec} Seconds")
+        
+
 
     # Set Header in self.session = requests.Session()
     def set_headers(self):
         self.session.headers.update({
-            'User-Agent': ua.random,
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Mobile Safari/537.36',
             'Accept': 'application/json, text/plain, */*',
             'Accept-Language': 'en-US,en;q=0.5',
             'Content-Type': 'application/json',
@@ -110,6 +120,8 @@ class CoWinBook():
             }
 
         response = self.session.post('https://cdn-api.co-vin.in/api/v2/auth/generateMobileOTP',data=self.get_data())
+
+        if self.otp == 's': requests.delete(f"{OTP_SITE_URL}/{self.mobile_no}")
 
         otpSha265 = self.get_otp()
 
@@ -202,7 +214,11 @@ class CoWinBook():
     # Request for Current Slot Deatails ( Private Request )
     def request_slot(self):
         todayDate = datetime.now().strftime("%d-%m-%Y")
-        response = self.session.get(f'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={self.pincode}&date={todayDate}')
+
+        if self.checkByPincode:
+            response = self.session.get(f'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={self.pin}&date={todayDate}')
+        else: # Check by District
+            response = self.session.get(f'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={self.pin}&date={todayDate}')
 
         if response.ok:
             self.check_slot(response.json())
@@ -223,13 +239,13 @@ class CoWinBook():
                 self.slot_time = session.get('slots')[0]
 
                 center_name = center.get('name')
-                capacity = session.get('available_capacity')
+                capacity = session.get(f'available_capacity_dose{self.dose}')
                 session_date = session.get('date')
                 
                 vaccine_name = session.get('vaccine')
 
                 if session.get('min_age_limit') == self.age and capacity > 1 and center.get('center_id') in  self.center_id:
-                    MSG = f'💉 {capacity} #{vaccine_name} / {session_date} / {center_name} 📍{self.pincode}'
+                    MSG = f'💉 {capacity} #{vaccine_name} / {session_date} / {center_name} 📍{self.pin}'
 
                     # Send Notification via Termux:API App
                     os.system(f"termux-notification --content '{MSG}'")
@@ -324,17 +340,47 @@ class CoWinBook():
         self.select_center()
         self.select_beneficiaries()
 
+    # Get District Id
+    def get_district_id(self):
+        response = self.session.get("https://cdn-api.co-vin.in/api/v2/admin/location/states").json()
+
+        print("Select State : ")
+        for state in response.get("states",):
+            state_id = state.get("state_id")
+            state_name = state.get('state_name')
+            print(f"{state_id} : {state_name}")
+        
+        index = input("Enter Index : ")
+        clear_screen()
+        response =  self.session.get(f"https://cdn-api.co-vin.in/api/v2/admin/location/districts/{index}").json()
+
+        print("Select District : ")
+        for dist in response.get("districts"):
+            dist_id = dist.get("district_id")
+            dist_name = dist.get('district_name')
+            print(f"{dist_id} : {dist_name}")
+        
+        index = input("Enter Index : ")
+        
+        clear_screen()
+        return index
+
     # Select Center for Vaccination
     def select_center(self):
 
-        response = self.session.get(
-            'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={}&date={}'.format(self.pincode,self.todayDate),
-            ).json()
+        if self.checkByPincode:
+            response = self.session.get(
+                f'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByPin?pincode={self.pin}&date={self.todayDate}'
+                ).json()
+        else: # Check by District
+            response = self.session.get(
+                f'https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id={self.pin}&date={self.todayDate}'
+                ).json()
 
         CENTERS = {}
         INDEX_S = []
 
-        print(f"Select Vaccination Center ({self.pincode}) 💉 \n")
+        print(f"Select Vaccination Center ({self.pin}) 💉 \n")
         counter = 1
         for center in response.get('centers',[]):
             for session in center.get('sessions'):
@@ -361,7 +407,7 @@ class CoWinBook():
         input_index = input("Enter Index's : ")
 
         if input_index != '':
-            INDEX_S = re.findall("(\d)",input_index)
+            INDEX_S = re.findall("(\d+)",input_index)
             
         clear_screen()
 
@@ -420,19 +466,29 @@ class CoWinBook():
         self.user_id = USER_ID
 
  
-def main(mobile_no,pincode, age = 18,dose = 1,time = 30,otp = 'a'):
+def main(mobile_no,pin = None, age = None,dose = None,otp = None,time = 30):
 
     # Correct Age
-    age =  18 if age < 45 else 45
+    if age is None:
+        age = 18
+    else:
+        age = 18 if age < 45 else 45
 
     # Max 30 Seconds
-    time = 30 if time > 30 else time
+    global timeInSec
+    timeInSec = 30 if time > 30 else time
 
     global cowin
-    cowin = CoWinBook(mobile_no,pincode,age,dose,otp)
+    cowin = CoWinBook(
+                    mobile_no = mobile_no,
+                    age = age,
+                    pin = pin or "Not passed",
+                    dose = dose or 1,
+                    otp = otp or 'a'
+                    )
 
-    scheduler.add_job(cowin.book_now, 'cron', second = f'*/{time}')
-    print(f" 📍 {pincode} 💉 {age}+ ⌛️ {time} Seconds")
+    scheduler.add_job(cowin.book_now, 'cron', second = f'*/{timeInSec or 30}')
+    
 
 
 if __name__ == '__main__':
