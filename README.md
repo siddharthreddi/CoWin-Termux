@@ -53,7 +53,7 @@ Command for script :
 ### :warning: Required values like mentioned below:
 
   - Replace `--m = MOBILE-NO` with your mobile no.
-  - Replace `--p = PIN-CODE` with your pincode.
+  - Replace `--p = PIN-CODE or DISTRICT-ID` with your Pincode or District Id.
 
 ### :bulb: Optional arguments accepted:
   - Pass `--o` = OTP fetching mode.`a` = AutoMode `s` = SiteMode `m` = ManualMode
