@@ -1,4 +1,4 @@
-#  CoWIN Auto Booking Slot (24/05/2021 )
+#  CoWIN Auto Booking Slot (26/05/2021 )
 
 Auto Slot Booking when there is a vaccine slot available at your location, by running a script on your phone. 
 
@@ -10,9 +10,11 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
   ## Getting Started
   By using Tremux you can run script and recieve the notification on your phone.
-  - ### Install Termux
 
-    - Install Termux App  [Playstore](https://play.google.com/store/apps/details?id=com.termux&hl=en_IN&gl=US).
+  - ### Install Termux 
+
+    - Install Termux App [FDroid](https://f-droid.org/en/packages/com.termux/).
+    ##### Don't install Termux or Termux:API from Playstore.
 
     
  - ### Installing Packages and Requirements
@@ -35,7 +37,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
   - ### OTP Fetching Methods
       // Three Options //
     - AutoMode (`a`) : Fetch OTP using Termux:API App 
-      - Install Termux:API ( Required v 0.31 to read SMS ) [Apkpure Link](https://m.apkpure.com/termux-api/com.termux.api/download/31-APK).
+      - Install Termux:API [FDroid](https://f-droid.org/en/packages/com.termux.api/).
           
     - SiteMode (`s`) :  Fetch OTP from Database Hosted on Cloudflare Worker
       - setup Database on [Cloudflare.](https://github.com/truroshan/CloudflareCoWinDB)
