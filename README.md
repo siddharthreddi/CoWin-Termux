@@ -13,7 +13,7 @@ Auto Slot Booking when there is a vaccine slot available at your location, by ru
 
   - ### Install Termux 
 
-    - Install Termux App [FDroid](https://f-droid.org/en/packages/com.termux/).
+    - Install Termux App [FDroid](https://f-droid.org/en/packages/com.termux/) OR click here to [install](https://f-droid.org/repo/com.termux.api_48.apk)
     ##### Termux wiki suggest not to use playstore termux.
 
     
